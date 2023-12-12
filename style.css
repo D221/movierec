@@ -8,9 +8,6 @@ li {
     margin-bottom: 20px;
 }
 
-img {
-    margin-right: 5px;
-}
 
 .loader {
     border: 4px solid rgba(0, 0, 0, 0.1);
@@ -30,4 +27,40 @@ img {
     100% {
         transform: rotate(360deg);
     }
+}
+
+#moviePoster {
+
+}
+
+#movieBackdrop {
+
+}
+
+#movieTitle {
+
+}
+
+#movieDate {
+
+}
+
+#movieGenres {
+
+}
+
+#movieOverview {
+
+}
+
+#movieVoteAverage {
+
+}
+
+#movieFlags {
+
+}
+
+#movieFlag {
+    margin-right: 5px;
 }
