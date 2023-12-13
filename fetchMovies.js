@@ -65,6 +65,7 @@ async function fetchAllPages() {
         return {
           id: movie.id,
           title: movie.title,
+          runtime: formatRuntime(movieDetailsData.runtime),
           releaseDate: movie.release_date,
           budget: formattedBudget,
           posterPath: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
@@ -94,7 +95,7 @@ async function fetchAllPages() {
 
 document.getElementById('filter-form').addEventListener('submit', function (event) {
   event.preventDefault(); // Prevent the default form submission
-  
+
   // Get values from the form
   const startYear = parseInt(document.getElementById('start-year').value);
   const endYear = parseInt(document.getElementById('end-year').value);
@@ -139,6 +140,14 @@ function filterByGenre(genreName) {
   displayFilteredMovies(filteredMovies);
 }
 
+function formatRuntime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  const formattedRuntime = `${hours}h ${remainingMinutes}m`;
+  return formattedRuntime;
+}
+
 // Function to display filtered movies
 function displayFilteredMovies(filteredMovies) {
   const movieDetailsListElement = document.getElementById('movieDetailsList');
@@ -157,13 +166,19 @@ function displayFilteredMovies(filteredMovies) {
   const shuffledMovies = shuffleArray(filteredMovies);
 
   shuffledMovies.forEach(movie => {
-    const li = document.createElement('li');
-    li.classList.add('movie-item'); // Add a class for better styling
+    const card = document.createElement('div');
+    card.className = 'card col-6 p-3';
+
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'row';
+
+    const imgCol1 = document.createElement('div');
+    imgCol1.className = 'col-4';
 
     const img = document.createElement('img');
     img.src = movie.posterPath || 'https://via.placeholder.com/150'; // Placeholder image if no poster available
     img.alt = movie.title;
-    img.style.width = '100px'; // Adjust width as needed
+    img.style.width = '100%'; // Adjust width as needed
     img.addEventListener('click', () => {
       if (movie.id) {
         const tmdbURL = `https://www.themoviedb.org/movie/${movie.id}`;
@@ -171,52 +186,67 @@ function displayFilteredMovies(filteredMovies) {
       }
     });
     img.style.cursor = 'pointer';
-    img.id = "moviePoster"
-    li.appendChild(img);
+    img.className = "card-img-top"
+    imgCol1.appendChild(img);
+
+    const imgCol2 = document.createElement('div');
+    imgCol2.className = 'col';
 
     const backdropImg = document.createElement('img');
     backdropImg.src = movie.backdropPath || 'https://via.placeholder.com/300x150'; // Placeholder image if no backdrop available
     backdropImg.alt = `${movie.title} backdrop`;
-    backdropImg.style.width = '300px'; // Adjust width as needed
-    backdropImg.id = "movieBackdrop"
-    li.appendChild(backdropImg);
+    backdropImg.style.width = '100%'; // Adjust width as needed
+    backdropImg.className = "card-img-top"
+    imgCol2.appendChild(backdropImg);
 
-    const detailsContainer = document.createElement('div');
-    detailsContainer.classList.add('details-container'); // Add a class for better styling
+    rowDiv.appendChild(imgCol1);
+    rowDiv.appendChild(imgCol2);
+
+    card.appendChild(rowDiv);
+
 
     const title = document.createElement('div');
-    title.innerHTML = `Title: ${movie.title}`;
-    title.id = "movieTitle";
-    detailsContainer.appendChild(title);
+    title.innerHTML = `${movie.title}`;
+    title.className = "card-title";
+    card.appendChild(title);
+
+    const detailsContainer = document.createElement('ul');
+    detailsContainer.className = 'list-group list-group-flush'
 
     const date = document.createElement('div');
-    date.innerHTML = `Release Date: ${movie.releaseDate}`;
-    date.id = "movieDate";
+    date.innerHTML = `<b>Release Date:</b> ${movie.releaseDate}`;
+    date.className = "list-group-item";
     detailsContainer.appendChild(date);
 
+    const runtime = document.createElement('div');
+    runtime.innerHTML = `<b>Runtime:</b> ${movie.runtime}`;
+    runtime.className = "list-group-item";
+    detailsContainer.appendChild(runtime);
+
     const genres = document.createElement('div');
-    genres.textContent = `Genres: ${movie.genres}`;
-    genres.id = "movieGenres";
+    genres.innerHTML = `<b>Genres:</b> ${movie.genres}`;
+    genres.className = "list-group-item";
     detailsContainer.appendChild(genres);
 
     const overview = document.createElement('div');
-    overview.textContent = `Overview: ${movie.overview}`;
-    overview.id = "movieOverview";
+    overview.innerHTML = `<b>Overview:</b> ${movie.overview}`;
+    overview.className = "list-group-item";
     detailsContainer.appendChild(overview);
 
     const budget = document.createElement('div');
-    budget.textContent = `Budget: ${movie.budget || 'Not available'}`;
-    budget.id = "movieOverview";
+    budget.innerHTML = `<b>Budget:</b> ${movie.budget || 'Not available'}`;
+    budget.className = "list-group-item";
     detailsContainer.appendChild(budget);
 
     const voteAverage = document.createElement('div');
     voteAverage.style.cssText = movie.voteAverageStyle;
-    voteAverage.textContent = `Vote Average: ${movie.voteAverage}`;
-    voteAverage.id = "movieVoteAverage";
+    voteAverage.innerHTML = `<b>User Average:</b> ${movie.voteAverage}`;
+    voteAverage.className = "list-group-item";
     detailsContainer.appendChild(voteAverage);
 
     const productionCountries = document.createElement('div');
-    productionCountries.textContent = `Production Countries: `;
+    productionCountries.className = "list-group-item";
+    productionCountries.innerHTML = "Production Countries:";
     const flagContainer = document.createElement('div');
     flagContainer.id = "movieFlags";
 
@@ -225,14 +255,16 @@ function displayFilteredMovies(filteredMovies) {
       flag.src = flagUrl;
       flag.alt = 'Country Flag';
       flag.id = "movieFlag"
+      flag.className = "mx-1"
       flagContainer.appendChild(flag);
     });
 
     productionCountries.appendChild(flagContainer);
     detailsContainer.appendChild(productionCountries);
 
-    li.appendChild(detailsContainer);
-    movieDetailsListElement.appendChild(li);
+    card.appendChild(detailsContainer);
+    // movieDetailsListElement.appendChild(li);
+    movieDetailsListElement.appendChild(card);
   });
 }
 

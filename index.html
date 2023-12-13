@@ -3,36 +3,49 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Movies Recommendations</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
 </head>
 
 
 <body>
-    <form id="filter-form">
-        <label for="start-year">Start Year:</label>
-        <input type="number" id="start-year" min="1900" max="2099" step="1">
+    <div class="container">
+        <form id="filter-form">
+            <div class="row m-3">
+                <div class="col-auto">
+                    <label class="form-label" for="start-year">Start Year:</label>
+                    <input class="form-control" type="number" id="start-year" min="1900" max="2099" step="1">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label" for="end-year">End Year:</label>
+                    <input class="form-control" type="number" id="end-year" min="1900" max="2099" step="1">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label" for="genre">Genre:</label>
+                    <select class="form-control" id="genre"></select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                    <button class="btn btn-danger" type="button" id="clear-btn">Clear</button>
+                </div>
+            </div>
+        </form>
 
-        <label for="end-year">End Year:</label>
-        <input type="number" id="end-year" min="1900" max="2099" step="1">
+        <div id="movieDetailsList" class="d-flex flex-wrap justify-content-between">
 
-        <label for="genre">Genre:</label>
-        <select id="genre"></select>
-
-        <input type="submit" value="Filter">
-        <button type="button" id="clear-btn">Clear</button>
-    </form>
-
-    <ul id="movieDetailsList">
-        <!-- Movie details will be displayed here -->
-    </ul>
-    <div id="loadingScreen">
-        <p>Loading...</p>
-        <div class="loader" id="loadingSpinner"></div>
-    </div>
+            <div class="spinner-border" role="status" id="loadingScreen">
+                <span class="visually-hidden">Loading...</span>
+            </div>
 
 
-    <script src="fetchMovies.js"></script>
+            <script src="fetchMovies.js"></script>
+        </div>
 </body>
 
 </html>
