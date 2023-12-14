@@ -101,15 +101,7 @@ document.getElementById('filter-form').addEventListener('submit', function (even
   const endYear = parseInt(document.getElementById('end-year').value);
   const selectedGenre = document.getElementById('genre').value;
 
-  // Filter by release date
-  if (!isNaN(startYear) && !isNaN(endYear)) {
-    filterByReleaseDate(startYear, endYear);
-  }
-
-  // Filter by genre
-  if (selectedGenre !== '') {
-    filterByGenre(selectedGenre);
-  }
+  filterMovies(startYear, endYear, selectedGenre);
 });
 document.getElementById('clear-btn').addEventListener('click', function () {
   // Clear the input fields and reset the select dropdown to its default value
@@ -121,20 +113,13 @@ document.getElementById('clear-btn').addEventListener('click', function () {
   displayFilteredMovies(allMovieDetails)
 });
 
-// Filter movies by release date range
-function filterByReleaseDate(startYear, endYear) {
-  const filteredMoviesByYear = allMovieDetails.filter(movie => {
-    const movieReleaseYear = new Date(movie.releaseDate).getFullYear();
-    return movieReleaseYear >= startYear && movieReleaseYear <= endYear;
-  });
-
-  displayFilteredMovies(filteredMoviesByYear);
-}
-
-// Filter movies by genre
-function filterByGenre(genreName) {
+function filterMovies(startYear, endYear, selectedGenre) {
   const filteredMovies = allMovieDetails.filter(movie => {
-    return movie.genres.toLowerCase().includes(genreName.toLowerCase());
+    const movieReleaseYear = new Date(movie.releaseDate).getFullYear();
+    const matchesYear = isNaN(startYear) || isNaN(endYear) || (movieReleaseYear >= startYear && movieReleaseYear <= endYear);
+    const matchesGenre = selectedGenre === '' || movie.genres.toLowerCase().includes(selectedGenre.toLowerCase());
+    
+    return matchesYear && matchesGenre;
   });
 
   displayFilteredMovies(filteredMovies);
@@ -167,7 +152,7 @@ function displayFilteredMovies(filteredMovies) {
 
   shuffledMovies.forEach(movie => {
     const card = document.createElement('div');
-    card.className = 'card col-6 p-3';
+    card.className = 'card col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-12 p-3';
 
     const rowDiv = document.createElement('div');
     rowDiv.className = 'row';
@@ -203,48 +188,52 @@ function displayFilteredMovies(filteredMovies) {
     rowDiv.appendChild(imgCol2);
 
     card.appendChild(rowDiv);
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
 
-
-    const title = document.createElement('div');
+    const title = document.createElement('h5');
     title.innerHTML = `${movie.title}`;
     title.className = "card-title";
-    card.appendChild(title);
+    cardBody.appendChild(title);
+
+    const overview = document.createElement('p');
+    overview.innerHTML = `${movie.overview}`;
+    overview.className = "list-group-item";
+    cardBody.appendChild(overview);
+
+    card.appendChild(cardBody);
 
     const detailsContainer = document.createElement('ul');
     detailsContainer.className = 'list-group list-group-flush'
 
-    const date = document.createElement('div');
+    const date = document.createElement('li');
     date.innerHTML = `<b>Release Date:</b> ${movie.releaseDate}`;
     date.className = "list-group-item";
     detailsContainer.appendChild(date);
 
-    const runtime = document.createElement('div');
+    const runtime = document.createElement('li');
     runtime.innerHTML = `<b>Runtime:</b> ${movie.runtime}`;
     runtime.className = "list-group-item";
     detailsContainer.appendChild(runtime);
 
-    const genres = document.createElement('div');
+    const genres = document.createElement('li');
     genres.innerHTML = `<b>Genres:</b> ${movie.genres}`;
     genres.className = "list-group-item";
     detailsContainer.appendChild(genres);
 
-    const overview = document.createElement('div');
-    overview.innerHTML = `<b>Overview:</b> ${movie.overview}`;
-    overview.className = "list-group-item";
-    detailsContainer.appendChild(overview);
 
-    const budget = document.createElement('div');
+    const budget = document.createElement('li');
     budget.innerHTML = `<b>Budget:</b> ${movie.budget || 'Not available'}`;
     budget.className = "list-group-item";
     detailsContainer.appendChild(budget);
 
-    const voteAverage = document.createElement('div');
+    const voteAverage = document.createElement('li');
     voteAverage.style.cssText = movie.voteAverageStyle;
     voteAverage.innerHTML = `<b>User Average:</b> ${movie.voteAverage}`;
     voteAverage.className = "list-group-item";
     detailsContainer.appendChild(voteAverage);
 
-    const productionCountries = document.createElement('div');
+    const productionCountries = document.createElement('li');
     productionCountries.className = "list-group-item";
     productionCountries.innerHTML = "Production Countries:";
     const flagContainer = document.createElement('div');
@@ -267,17 +256,6 @@ function displayFilteredMovies(filteredMovies) {
     movieDetailsListElement.appendChild(card);
   });
 }
-
-document.getElementById('genre').addEventListener('change', function () {
-  const selectedGenre = this.value;
-
-  if (selectedGenre !== '') {
-    filterByGenre(selectedGenre);
-  } else {
-    // If no genre selected, display all movies
-    displayFilteredMovies(allMovieDetails);
-  }
-});
 
 // Call the initial function to fetch all movies
 fetchAllPages();
