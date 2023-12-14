@@ -116,10 +116,11 @@ document.getElementById('clear-btn').addEventListener('click', function () {
 function filterMovies(startYear, endYear, selectedGenre) {
   const filteredMovies = allMovieDetails.filter(movie => {
     const movieReleaseYear = new Date(movie.releaseDate).getFullYear();
-    const matchesYear = isNaN(startYear) || isNaN(endYear) || (movieReleaseYear >= startYear && movieReleaseYear <= endYear);
+    const matchesStartYear = isNaN(startYear) || movieReleaseYear >= startYear;
+    const matchesEndYear = isNaN(endYear) || movieReleaseYear <= endYear;
     const matchesGenre = selectedGenre === '' || movie.genres.toLowerCase().includes(selectedGenre.toLowerCase());
     
-    return matchesYear && matchesGenre;
+    return matchesStartYear && matchesEndYear && matchesGenre;
   });
 
   displayFilteredMovies(filteredMovies);
