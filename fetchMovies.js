@@ -64,6 +64,7 @@ async function fetchAllPages() {
 
         return {
           id: movie.id,
+          imdb_id: movieDetailsData.imdb_id,
           title: movie.title,
           runtime: formatRuntime(movieDetailsData.runtime),
           releaseDate: movie.release_date,
@@ -100,27 +101,30 @@ document.getElementById('filter-form').addEventListener('submit', function (even
   const startYear = parseInt(document.getElementById('start-year').value);
   const endYear = parseInt(document.getElementById('end-year').value);
   const selectedGenre = document.getElementById('genre').value;
+  const rating = document.getElementById('rating').value;
 
-  filterMovies(startYear, endYear, selectedGenre);
+  filterMovies(startYear, endYear, selectedGenre, rating);
 });
 document.getElementById('clear-btn').addEventListener('click', function () {
   // Clear the input fields and reset the select dropdown to its default value
   document.getElementById('start-year').value = '';
   document.getElementById('end-year').value = '';
   document.getElementById('genre').value = '';
+  document.getElementById('rating').value = '';
   // Trigger the filter form submission to clear the filtered movies
   document.getElementById('filter-form').dispatchEvent(new Event('submit'));
   displayFilteredMovies(allMovieDetails)
 });
 
-function filterMovies(startYear, endYear, selectedGenre) {
+function filterMovies(startYear, endYear, selectedGenre, rating) {
   const filteredMovies = allMovieDetails.filter(movie => {
     const movieReleaseYear = new Date(movie.releaseDate).getFullYear();
     const matchesStartYear = isNaN(startYear) || movieReleaseYear >= startYear;
     const matchesEndYear = isNaN(endYear) || movieReleaseYear <= endYear;
     const matchesGenre = selectedGenre === '' || movie.genres.toLowerCase().includes(selectedGenre.toLowerCase());
-    
-    return matchesStartYear && matchesEndYear && matchesGenre;
+    const matchesRating = isNaN(rating) || movie.voteAverage >= rating;
+
+    return matchesStartYear && matchesEndYear && matchesGenre && matchesRating;
   });
 
   displayFilteredMovies(filteredMovies);
@@ -167,7 +171,7 @@ function displayFilteredMovies(filteredMovies) {
     img.style.width = '100%'; // Adjust width as needed
     img.addEventListener('click', () => {
       if (movie.id) {
-        const tmdbURL = `https://www.themoviedb.org/movie/${movie.id}`;
+        const tmdbURL = `https://www.imdb.com/title/${movie.imdb_id}`;
         window.open(tmdbURL, '_blank');
       }
     });
@@ -252,8 +256,23 @@ function displayFilteredMovies(filteredMovies) {
     productionCountries.appendChild(flagContainer);
     detailsContainer.appendChild(productionCountries);
 
+    const IMDbLink = document.createElement('a');
+    IMDbLink.className = "card-link";
+    IMDbLink.href = `https://www.imdb.com/title/${movie.imdb_id}`;
+    IMDbLink.alt = 'IMDb';
+    IMDbLink.innerHTML = `IMDb`;
+    IMDbLink.target = '_blank';
+    cardBody.appendChild(IMDbLink);
+
+    const TMDBLink = document.createElement('a');
+    TMDBLink.className = "card-link";
+    TMDBLink.href = `https://www.themoviedb.org/movie/${movie.id}`;
+    TMDBLink.alt = 'TMDB';
+    TMDBLink.innerHTML = `TMDB`;
+    TMDBLink.target = '_blank';
+    cardBody.appendChild(TMDBLink);
+
     card.appendChild(detailsContainer);
-    // movieDetailsListElement.appendChild(li);
     movieDetailsListElement.appendChild(card);
   });
 }
