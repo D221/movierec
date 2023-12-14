@@ -123,12 +123,12 @@ document.getElementById('clear-btn').addEventListener('click', function () {
 
 // Filter movies by release date range
 function filterByReleaseDate(startYear, endYear) {
-  const filteredMovies = allMovieDetails.filter(movie => {
+  const filteredMoviesByYear = allMovieDetails.filter(movie => {
     const movieReleaseYear = new Date(movie.releaseDate).getFullYear();
     return movieReleaseYear >= startYear && movieReleaseYear <= endYear;
   });
 
-  displayFilteredMovies(filteredMovies);
+  displayFilteredMovies(filteredMoviesByYear);
 }
 
 // Filter movies by genre
