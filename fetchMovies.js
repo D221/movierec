@@ -6,11 +6,11 @@ const options = {
   }
 };
 const apiKey = 'ff7d9602a07d3255966379fdf4c92a4f';
-const listId = 634;
-const totalPages = 13;
+const totalPages = 15;
 const allMovieDetails = [];
 const loadingScreen = document.getElementById('loadingScreen');
 
+// Fetch genres from api and add them to select form
 fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', options)
   .then(response => response.json())
   .then(response => {
@@ -25,16 +25,15 @@ fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', options)
   })
   .catch(err => console.error(err));
 
-// Function to fetch movie details
-async function fetchAllPages() {
 
+async function fetchTopRatedMovies() {
   try {
     for (let page = 1; page <= totalPages; page++) {
-      const response = await fetch(`https://api.themoviedb.org/3/list/${listId}?language=en-US&page=${page}`, options);
+      const response = await fetch(`https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${page}`, options);
       const data = await response.json();
 
-      // Extracting 'id', 'title', 'release_date', 'poster_path', 'overview', 'genre_ids', 'original_language', and 'production_countries' and storing in an array
-      const movieDetails = data.items.map(async movie => {
+      // Process data similarly to what you were doing before
+      const movieDetails = data.results.map(async movie => {
         const movieDetailsResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}`);
         const movieDetailsData = await movieDetailsResponse.json();
 
@@ -77,22 +76,24 @@ async function fetchAllPages() {
           voteAverageStyle,
           productionCountries,
           countryFlagUrls,
+          vote_count: movieDetailsData.vote_count,
         };
       });
 
       for await (const movie of movieDetails) {
-        allMovieDetails.push(movie);
+        if (movie.vote_count >= 1000)
+          allMovieDetails.push(movie);
       }
     }
 
-    // Display movie details in the HTML list
-    displayFilteredMovies(allMovieDetails);
-    loadingScreen.style.display = 'none';
+    return allMovieDetails;
   } catch (error) {
     console.error(error);
     loadingScreen.style.display = 'none';
+    return [];
   }
 }
+
 
 document.getElementById('filter-form').addEventListener('submit', function (event) {
   event.preventDefault(); // Prevent the default form submission
@@ -277,5 +278,16 @@ function displayFilteredMovies(filteredMovies) {
   });
 }
 
-// Call the initial function to fetch all movies
-fetchAllPages();
+async function init() {
+  try {
+    loadingScreen.style.display = 'block';
+    const allMovieDetails = await fetchTopRatedMovies();
+    displayFilteredMovies(allMovieDetails);
+    loadingScreen.style.display = 'none';
+  } catch (error) {
+    console.error(error);
+    loadingScreen.style.display = 'none';
+  }
+}
+
+init();
